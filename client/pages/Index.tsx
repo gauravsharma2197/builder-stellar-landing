@@ -1,14 +1,14 @@
 import Hero from "@/components/sections/Hero";
-import FeatureGrid from "@/components/sections/FeatureGrid";
 import WorkflowTimeline from "@/components/sections/WorkflowTimeline";
+import FeatureGrid from "@/components/sections/FeatureGrid";
 import LiveConsole from "@/components/sections/LiveConsole";
 
 export default function Index() {
   return (
     <div>
       <Hero />
-      <FeatureGrid />
       <WorkflowTimeline />
+      <FeatureGrid />
       <LiveConsole />
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-20 text-center">
         <h3 className="text-2xl font-semibold">Showcase agentic competence</h3>
