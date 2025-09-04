@@ -48,17 +48,35 @@ export default function FeatureGrid() {
         <p className="mt-3 text-muted-foreground">Demonstrate end-to-end capabilities at your CXO conference with a clear, visual narrative.</p>
       </div>
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {features.map(({ icon: Icon, title, desc, color }) => (
-          <Card key={title} className="border-border/60 bg-gradient-to-br from-background to-muted/40 hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className={`size-10 rounded-md bg-gradient-to-br ${color} flex items-center justify-center mb-4`}>
-                <Icon className="size-5" />
-              </div>
-              <CardTitle className="text-lg">{title}</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0 text-sm text-muted-foreground">{desc}</CardContent>
-          </Card>
-        ))}
+        {features.map(({ icon: Icon, title, desc, color }) => {
+          // map feature titles to pipeline stage ids
+          const stageMap: Record<string, string> = {
+            "Documentation Generation": "docs",
+            "Code Analysis": "analysis",
+            "Automated Migration": "migration",
+            "AI Code Review": "review",
+            "Unit Test Synthesis": "tests",
+            "Master Agent Orchestration": "output",
+          };
+          const stage = stageMap[title] ?? "legacy";
+          return (
+            <button
+              key={title}
+              onClick={() => window.dispatchEvent(new CustomEvent("select-stage", { detail: { stage } }))}
+              className="text-left"
+            >
+              <Card className="border-border/60 bg-gradient-to-br from-background to-muted/40 hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <div className={`size-10 rounded-md bg-gradient-to-br ${color} flex items-center justify-center mb-4`}>
+                    <Icon className="size-5" />
+                  </div>
+                  <CardTitle className="text-lg">{title}</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 text-sm text-muted-foreground">{desc}</CardContent>
+              </Card>
+            </button>
+          );
+        })}
       </div>
     </section>
   );
