@@ -60,7 +60,7 @@ export default function Hero() {
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <Button size="lg" className="bg-gradient-to-r from-brand to-brand-2 text-white shadow-lg" onClick={() => startOrchestration()}>
+            <Button size="lg" className="bg-gradient-to-r from-brand to-brand-2 text-white shadow-lg" onClick={openSetup}>
               <Play className="size-4"/> Start Orchestration
             </Button>
             <Button size="lg" variant="outline" className="border-brand text-brand hover:bg-brand/10" onClick={handleExplore}>
