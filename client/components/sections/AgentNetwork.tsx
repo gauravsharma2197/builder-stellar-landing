@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { BookOpen, Settings2, GitBranch, ShieldCheck, TestTube } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const AGENTS = [
   { id: "docs", label: "Documentation", icon: BookOpen },
@@ -10,86 +11,119 @@ const AGENTS = [
 ];
 
 export default function AgentNetwork({ active }: { active: string }) {
-  const positions = useMemo(() => {
-    const base = [
-      { x: 40, y: 18 },
-      { x: 80, y: 40 },
-      { x: 64, y: 78 },
-      { x: 24, y: 82 },
-      { x: 6, y: 48 },
-    ];
-    return base;
+  const [events, setEvents] = useState<string[]>([]);
+  const [agentStatus, setAgentStatus] = useState<Record<string, string>>(() => {
+    const m: Record<string, string> = {};
+    AGENTS.forEach((a) => (m[a.id] = "idle"));
+    return m;
+  });
+
+  useEffect(() => {
+    function onConsole(e: any) {
+      const msg = e.detail as string;
+      setEvents((s) => {
+        const next = [...s, msg].slice(-20);
+        return next;
+      });
+    }
+
+    function onSelect(e: any) {
+      const stage = e.detail?.stage as string;
+      if (!stage) return;
+      // set all to idle then mark active running
+      setAgentStatus((prev) => {
+        const next = { ...prev };
+        Object.keys(next).forEach((k) => (next[k] = "idle"));
+        if (next[stage] !== undefined) next[stage] = "running";
+        return next;
+      });
+      setEvents((s) => [...s, `[UI] Focused ${stage}`].slice(-20));
+    }
+
+    function onStart(e: any) {
+      setEvents((s) => [...s, `[MASTER] Orchestration initiated`].slice(-20));
+    }
+
+    function onRunStats(e: any) {
+      const payload = e.detail || {};
+      setEvents((s) => [...s, `[STATS] ${JSON.stringify(payload)}`].slice(-20));
+    }
+
+    window.addEventListener("console-log", onConsole as EventListener);
+    window.addEventListener("select-stage", onSelect as EventListener);
+    window.addEventListener("orchestration-start", onStart as EventListener);
+    window.addEventListener("run-stats", onRunStats as EventListener);
+
+    return () => {
+      window.removeEventListener("console-log", onConsole as EventListener);
+      window.removeEventListener("select-stage", onSelect as EventListener);
+      window.removeEventListener("orchestration-start", onStart as EventListener);
+      window.removeEventListener("run-stats", onRunStats as EventListener);
+    };
   }, []);
 
-  return (
-    <div className="w-[300px] hidden lg:block">
-      <div className="relative rounded-lg border border-border/60 bg-gradient-to-br from-background to-muted/40 p-4 h-[420px]">
-        <svg className="absolute inset-0 w-full h-full">
-          {/* subtle background grid */}
-          <defs>
-            <linearGradient id="gline" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="rgba(99,102,241,0.06)" />
-              <stop offset="100%" stopColor="rgba(56,189,248,0.04)" />
-            </linearGradient>
-          </defs>
-        </svg>
+  useEffect(() => {
+    // When external 'active' prop changes, mirror it to statuses
+    setAgentStatus((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((k) => (next[k] = k === active ? "running" : next[k] === "running" ? "completed" : next[k]));
+      return next;
+    });
+  }, [active]);
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-          <div className="size-20 rounded-full bg-gradient-to-br from-brand to-brand-2 flex items-center justify-center shadow-lg ring-4 ring-white/5">
-            <div className="size-8 rounded-full bg-white/6 flex items-center justify-center text-white font-semibold">MA</div>
-          </div>
-          <div className="mt-2 text-sm font-medium">Master Agent</div>
+  const handleViewLogs = () => {
+    const el = document.getElementById("insights");
+    el?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleFocus = (id: string) => {
+    window.dispatchEvent(new CustomEvent("select-stage", { detail: { stage: id } }));
+    const el = document.getElementById("workflow");
+    el?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <div className="w-full lg:w-[320px]">
+      <div className="rounded-lg border border-border/60 bg-gradient-to-br from-background to-muted/40 p-4 h-[420px] flex flex-col">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm font-medium">Agent Activity Feed</div>
+          <button onClick={handleViewLogs} className="text-xs text-muted-foreground underline">View logs</button>
         </div>
 
-        {AGENTS.map((a, i) => {
-          const Icon = a.icon;
-          const pos = positions[i];
-          const isActive = a.id === active;
-          return (
-            <div
-              key={a.id}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-            >
-              <div className={`flex flex-col items-center gap-2 ${isActive ? "animate-pulse" : ""}`}>
-                <div className={`size-12 rounded-full flex items-center justify-center border border-border/40 ${isActive ? "bg-gradient-to-br from-brand to-brand-2 text-white shadow-xl" : "bg-white/60"}`}>
-                  <Icon className={`${isActive ? "text-white" : "text-muted-foreground"} size-5`} />
+        <div className="flex-1 overflow-auto">
+          <div className="space-y-3 mb-4">
+            {AGENTS.map((a) => {
+              const StatusIcon = a.icon;
+              const status = agentStatus[a.id] || "idle";
+              return (
+                <div key={a.id} className="flex items-center justify-between gap-2 p-2 rounded hover:bg-background/50">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-md flex items-center justify-center ${status === "running" ? "bg-gradient-to-br from-brand to-brand-2 text-white shadow" : "bg-white/60"}`}>
+                      <StatusIcon className={`${status === "running" ? "text-white" : "text-muted-foreground"} size-5`} />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium">{a.label}</div>
+                      <div className="text-xs text-muted-foreground">{status === "running" ? "Running" : status === "completed" ? "Completed" : "Idle"}</div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge variant={status === "running" ? "default" : "outline"} className={status === "running" ? "bg-brand text-white" : ""}>{status === "running" ? "Active" : status === "completed" ? "Done" : "Idle"}</Badge>
+                    <button onClick={() => handleFocus(a.id)} className="text-xs text-muted-foreground underline">Focus</button>
+                  </div>
                 </div>
-                <div className="text-xs text-center">{a.label}</div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
 
-        {/* glowing connections */}
-        {AGENTS.map((a, i) => {
-          const pos = positions[i];
-          const x1 = 50; // center percent
-          const y1 = 50;
-          const x2 = pos.x;
-          const y2 = pos.y;
-          const isActive = a.id === active;
-          return (
-            <svg key={`conn-${a.id}`} className="absolute inset-0 pointer-events-none">
-              <line
-                x1={`${x1}%`}
-                y1={`${y1}%`}
-                x2={`${x2}%`}
-                y2={`${y2}%`}
-                stroke={isActive ? "url(#connGradient)" : "rgba(120,120,120,0.06)"}
-                strokeWidth={isActive ? 3 : 1}
-                strokeLinecap="round"
-                style={{ transition: "stroke 300ms, stroke-width 300ms" }}
-              />
-              <defs>
-                <linearGradient id="connGradient">
-                  <stop offset="0%" stopColor="hsl(var(--brand))" />
-                  <stop offset="100%" stopColor="hsl(var(--brand-2))" />
-                </linearGradient>
-              </defs>
-            </svg>
-          );
-        })}
+          <div className="mt-2">
+            <div className="text-xs text-muted-foreground mb-2">Recent events</div>
+            <div className="bg-black/90 text-emerald-200 p-3 rounded h-36 overflow-auto text-xs font-mono">
+              {events.length === 0 ? <div className="text-muted-foreground">No events yet.</div> : events.map((ev, i) => <div key={i} className="whitespace-pre-wrap">{ev}</div>)}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3 text-xs text-muted-foreground">Quick actions: focus an agent or view full logs</div>
       </div>
     </div>
   );
