@@ -3,10 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Play, ShieldCheck, ArrowRight } from "lucide-react";
 import OrchestrationGraph from "./OrchestrationGraph";
 import Modal from "@/components/ui/Modal";
-import PipelineBar from "./PipelineBar";
 
 export default function Hero() {
   const [open, setOpen] = useState(false);
+  const [gitUrl, setGitUrl] = useState("");
+  const [language, setLanguage] = useState("javascript");
+  const [target, setTarget] = useState("react18");
+  const [demoMode, setDemoMode] = useState("play");
 
   function openSetup() {
     setOpen(true);
@@ -15,8 +18,14 @@ export default function Hero() {
   function handleExplore() {
     const el = document.getElementById("workflow");
     el?.scrollIntoView({ behavior: "smooth" });
-    // open legacy stage by default
     window.dispatchEvent(new CustomEvent("select-stage", { detail: { stage: "legacy" } }));
+  }
+
+  function startOrchestration(payload?: any) {
+    const data = payload || { gitUrl, language, target, demoMode };
+    window.dispatchEvent(new CustomEvent("orchestration-start", { detail: data }));
+    const el = document.getElementById("workflow");
+    el?.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
@@ -34,14 +43,61 @@ export default function Hero() {
           <p className="mt-4 text-lg text-muted-foreground max-w-xl">
             Orchestrate specialized agents to document legacy systems, analyze code, migrate to latest frameworks, review changes, and auto-generate unit tests — all under a master agent.
           </p>
+
+          {/* KPI & Control strip replacing duplicate pipeline */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div className="col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
+                <div className="text-sm text-muted-foreground">Files Processed</div>
+                <div className="text-lg font-semibold">100k+</div>
+              </div>
+              <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
+                <div className="text-sm text-muted-foreground">Avg Pipeline Time</div>
+                <div className="text-lg font-semibold">6m 42s</div>
+              </div>
+              <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
+                <div className="text-sm text-muted-foreground">Success Rate</div>
+                <div className="text-lg font-semibold">99.9%</div>
+              </div>
+            </div>
+
+            <div className="col-span-1 p-3 rounded-lg border border-border/30 bg-background/60">
+              <div className="flex items-center gap-2 mb-2">
+                <button onClick={() => setDemoMode('play')} className={`px-2 py-1 rounded ${demoMode==='play' ? 'bg-brand text-white' : 'bg-background/50'}`}>Play</button>
+                <button onClick={() => setDemoMode('guided')} className={`px-2 py-1 rounded ${demoMode==='guided' ? 'bg-brand text-white' : 'bg-background/50'}`}>Guided</button>
+                <button onClick={() => setDemoMode('manual')} className={`px-2 py-1 rounded ${demoMode==='manual' ? 'bg-brand text-white' : 'bg-background/50'}`}>Manual</button>
+              </div>
+
+              <div className="space-y-2">
+                <input value={gitUrl} onChange={(e)=>setGitUrl(e.target.value)} placeholder="Git URL (optional)" className="w-full px-3 py-2 border border-border/30 rounded text-sm" />
+                <select value={language} onChange={(e)=>setLanguage(e.target.value)} className="w-full p-2 border border-border/30 rounded text-sm">
+                  <option value="javascript">JavaScript</option>
+                  <option value="typescript">TypeScript</option>
+                  <option value="python">Python</option>
+                  <option value="java">Java</option>
+                </select>
+                <select value={target} onChange={(e)=>setTarget(e.target.value)} className="w-full p-2 border border-border/30 rounded text-sm">
+                  <option value="react18">React 18</option>
+                  <option value="vite">Vite</option>
+                  <option value="node16">Node 16+</option>
+                </select>
+                <div className="flex items-center justify-between mt-2">
+                  <Button size="sm" variant="ghost" onClick={openSetup}>Advanced</Button>
+                  <Button size="sm" onClick={() => startOrchestration()} className="bg-gradient-to-r from-brand to-brand-2 text-white">Start</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <Button size="lg" className="bg-gradient-to-r from-brand to-brand-2 text-white shadow-lg" onClick={openSetup}>
+            <Button size="lg" className="bg-gradient-to-r from-brand to-brand-2 text-white shadow-lg" onClick={() => startOrchestration()}>
               <Play className="size-4"/> Start Orchestration
             </Button>
             <Button size="lg" variant="outline" className="border-brand text-brand hover:bg-brand/10" onClick={handleExplore}>
               Explore Workflow <ArrowRight className="size-4"/>
             </Button>
           </div>
+
           <dl className="mt-8 grid grid-cols-3 gap-4 max-w-lg text-center">
             <div>
               <dt className="text-2xl font-bold">5+</dt>
@@ -56,10 +112,6 @@ export default function Hero() {
               <dd className="text-xs text-muted-foreground">Deterministic Pipelines</dd>
             </div>
           </dl>
-
-          <div className="mt-8">
-            <PipelineBar active={"legacy"} onSelect={(s) => window.dispatchEvent(new CustomEvent("select-stage", { detail: { stage: s } }))} />
-          </div>
         </div>
         <OrchestrationGraph />
       </div>
