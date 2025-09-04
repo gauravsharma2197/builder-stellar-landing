@@ -8,8 +8,8 @@ export default function Index() {
     <div>
       <Hero />
       <WorkflowTimeline />
-      <FeatureGrid />
       <LiveConsole />
+      <FeatureGrid />
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-20 text-center">
         <h3 className="text-2xl font-semibold">Showcase agentic competence</h3>
         <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
