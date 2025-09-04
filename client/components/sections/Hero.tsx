@@ -140,7 +140,7 @@ export default function Hero() {
 
             <div className="mt-3 flex justify-end gap-2">
               <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 rounded border">Cancel</button>
-              <button type="submit" className="px-4 py-2 rounded bg-gradient-to-r from-brand to-brand-2 text-white">Start</button>
+              <button type="submit" className="px-4 py-2 rounded bg-gradient-to-r from-brand to-brand-2 text-white">Start Migration</button>
             </div>
           </div>
         </form>
