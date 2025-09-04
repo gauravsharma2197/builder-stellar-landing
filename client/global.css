@@ -57,6 +57,11 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Brand */
+    --brand: 199 89% 48%; /* cyan-500 */
+    --brand-2: 267 84% 60%; /* violet-500 */
+    --brand-foreground: 210 40% 98%;
   }
 
   .dark {
