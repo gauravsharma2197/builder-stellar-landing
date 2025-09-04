@@ -6,7 +6,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
       <Header />
-      <main className="relative z-0">{/* page content */}
+      <main className="relative z-0">
         <Outlet />
       </main>
       <Footer />
