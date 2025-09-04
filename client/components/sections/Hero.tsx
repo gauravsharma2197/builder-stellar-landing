@@ -40,44 +40,21 @@ export default function Hero() {
             Orchestrate specialized agents to document legacy systems, analyze code, migrate to latest frameworks, review changes, and auto-generate unit tests — all under a master agent.
           </p>
 
-          {/* KPI & Control strip replacing duplicate pipeline */}
+          {/* Platform totals (simplified hero) */}
           <div className="mt-6">
             <div className="text-xs text-muted-foreground mb-2">Platform totals</div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <div className="col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
-                  <div className="text-sm text-muted-foreground">Files Processed</div>
-                  <div className="text-lg font-semibold">100k+</div>
-                </div>
-                <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
-                  <div className="text-sm text-muted-foreground">Avg Pipeline Time</div>
-                  <div className="text-lg font-semibold">6m 42s</div>
-                </div>
-                <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
-                  <div className="text-sm text-muted-foreground">Success Rate</div>
-                  <div className="text-lg font-semibold">99.9%</div>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
+                <div className="text-sm text-muted-foreground">Files Processed</div>
+                <div className="text-lg font-semibold">100k+</div>
               </div>
-
-              <div className="col-span-1 p-3 rounded-lg border border-border/30 bg-background/60">
-                <div className="space-y-2">
-                  <input value={gitUrl} onChange={(e)=>setGitUrl(e.target.value)} placeholder="Git URL (optional)" className="w-full px-3 py-2 border border-border/30 rounded text-sm" />
-                  <select value={language} onChange={(e)=>setLanguage(e.target.value)} className="w-full p-2 border border-border/30 rounded text-sm">
-                    <option value="javascript">JavaScript</option>
-                    <option value="typescript">TypeScript</option>
-                    <option value="python">Python</option>
-                    <option value="java">Java</option>
-                  </select>
-                  <select value={target} onChange={(e)=>setTarget(e.target.value)} className="w-full p-2 border border-border/30 rounded text-sm">
-                    <option value="react18">React 18</option>
-                    <option value="vite">Vite</option>
-                    <option value="node16">Node 16+</option>
-                  </select>
-                  <div className="flex items-center justify-between mt-2">
-                    <Button size="sm" variant="ghost" onClick={openSetup}>Advanced</Button>
-                    <Button size="sm" onClick={() => startOrchestration()} className="bg-gradient-to-r from-brand to-brand-2 text-white">Start</Button>
-                  </div>
-                </div>
+              <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
+                <div className="text-sm text-muted-foreground">Avg Pipeline Time</div>
+                <div className="text-lg font-semibold">6m 42s</div>
+              </div>
+              <div className="p-3 rounded-lg bg-gradient-to-br from-white/5 to-white/3 border border-border/30 text-center">
+                <div className="text-sm text-muted-foreground">Success Rate</div>
+                <div className="text-lg font-semibold">99.9%</div>
               </div>
             </div>
           </div>
