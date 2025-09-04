@@ -1,31 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useRef, useState } from "react";
 
-const logLines = [
-  "[MASTER] Spawning DocumentationAgent:v2...",
-  "[DOCS] Extracting dependency graph (2,143 nodes)...",
-  "[DOCS] Building call trees for 431 entrypoints...",
-  "[MASTER] Spawning AnalysisAgent:v3...",
-  "[ANALYZE] Hotspots: 17 | Cycles: 3 | TechDebtScore: 72",
-  "[MASTER] Spawning MigrationAgent:v1...",
-  "[MIGRATE] Upgrading React 16 -> 18, Webpack -> Vite, ESLint -> Biome...",
-  "[MASTER] Spawning ReviewAgent:v2...",
-  "[REVIEW] 12 suggestions | 3 blockers | 9 auto-fixes applied",
-  "[MASTER] Spawning TestGenAgent:v4...",
-  "[TEST] Generated 126 tests | Coverage: 81% -> 91%",
-  "[MASTER] Pipeline complete in 07m:42s ✅",
-];
-
 export default function LiveConsole() {
   const [lines, setLines] = useState<string[]>([]);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let i = 0;
-    const t = setInterval(() => {
-      setLines((l) => (i < logLines.length ? [...l, logLines[i++]] : l));
-    }, 600);
-    return () => clearInterval(t);
+    function handler(e: any) {
+      const msg = e.detail as string;
+      setLines((l) => [...l, msg]);
+    }
+    window.addEventListener("console-log", handler as EventListener);
+    return () => window.removeEventListener("console-log", handler as EventListener);
   }, []);
 
   useEffect(() => {
