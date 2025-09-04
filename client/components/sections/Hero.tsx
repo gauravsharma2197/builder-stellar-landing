@@ -6,10 +6,6 @@ import Modal from "@/components/ui/Modal";
 
 export default function Hero() {
   const [open, setOpen] = useState(false);
-  const [gitUrl, setGitUrl] = useState("");
-  const [language, setLanguage] = useState("javascript");
-  const [target, setTarget] = useState("react18");
-  const [demoMode, setDemoMode] = useState("play");
 
   function openSetup() {
     setOpen(true);
@@ -22,7 +18,7 @@ export default function Hero() {
   }
 
   function startOrchestration(payload?: any) {
-    const data = payload || { gitUrl, language, target, demoMode };
+    const data = payload || {};
     window.dispatchEvent(new CustomEvent("orchestration-start", { detail: data }));
     const el = document.getElementById("workflow");
     el?.scrollIntoView({ behavior: "smooth" });
